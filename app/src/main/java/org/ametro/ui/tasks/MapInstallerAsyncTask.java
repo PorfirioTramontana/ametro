@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.PowerManager;
+import android.util.Log;
 
 import org.ametro.app.ApplicationEx;
 import org.ametro.catalog.MapCatalogManager;
@@ -22,8 +23,15 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class MapInstallerAsyncTask extends AsyncTask<Void, Object, Throwable> {
+    //ADDED
+    public static Semaphore task_MapInstallerAsync_Finish;
+    public static Semaphore task_MapInstallerAsync_Start;
+
+    //END ADDED
 
     private final IMapInstallerEventListener listener;
     private final ApplicationEx application;
@@ -42,6 +50,18 @@ public class MapInstallerAsyncTask extends AsyncTask<Void, Object, Throwable> {
 
     @Override
     protected Throwable doInBackground(Void... params) {
+        //ADDED
+        if (task_MapInstallerAsync_Start != null) {
+            try {
+                task_MapInstallerAsync_Start.acquire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            task_MapInstallerAsync_Start.release();
+        }
+
+        //END ADDED
+
         totalSize = getSize(maps);
         MapCatalogManager localManager = null;
         try {
@@ -71,6 +91,20 @@ public class MapInstallerAsyncTask extends AsyncTask<Void, Object, Throwable> {
             }
             localManager.addOrReplaceMapAll(updatedMaps.toArray(new MapInfo[updatedMaps.size()]));
         } catch (Throwable ex) {
+            //ADDED
+            if (task_MapInstallerAsync_Finish != null) {
+                try {
+                    if (!task_MapInstallerAsync_Finish.tryAcquire(15L, TimeUnit.SECONDS)) {
+                        Log.d("TEST", "TASK: TIMEOUT task i");
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.d("TEST", "TASK: End task i");
+                task_MapInstallerAsync_Finish.release();
+            }
+
+            //END ADDED
             return ex;
         } finally {
             if(localManager!=null) {
@@ -80,6 +114,20 @@ public class MapInstallerAsyncTask extends AsyncTask<Void, Object, Throwable> {
             }
             wakeLock.release();
         }
+        //ADDED
+        if (task_MapInstallerAsync_Finish != null) {
+            try {
+                if (!task_MapInstallerAsync_Finish.tryAcquire(15L, TimeUnit.SECONDS)) {
+                    Log.d("TEST", "TASK: TIMEOUT task i");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.d("TEST", "TASK: End task i");
+            task_MapInstallerAsync_Finish.release();
+        }
+
+        //END ADDED
         return null;
     }
 

@@ -4,10 +4,18 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import org.ametro.model.MapContainer;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 public class MapLoadAsyncTask extends AsyncTask<Void, String, Throwable> {
+    //ADDED
+    public static Semaphore task_MapLoadAsync_Finish;
+    public static Semaphore task_MapLoadAsync_Start;
+    //END ADDED
 
     private static final String DEFAULT_SCHEME = "metro";
     private static final String[] DEFAULT_TRANSPORTS = null;
@@ -37,6 +45,18 @@ public class MapLoadAsyncTask extends AsyncTask<Void, String, Throwable> {
 
     @Override
     protected Throwable doInBackground(Void... params) {
+        //ADDED
+        if (task_MapLoadAsync_Start != null) {
+            try {
+                task_MapLoadAsync_Start.acquire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            task_MapLoadAsync_Start.release();
+        }
+
+        //END ADDED
+
         wakeLock.acquire();
         try {
             start = System.currentTimeMillis();
@@ -47,6 +67,21 @@ public class MapLoadAsyncTask extends AsyncTask<Void, String, Throwable> {
         } finally {
             wakeLock.release();
         }
+
+        //ADDED
+        if (task_MapLoadAsync_Finish != null) {
+            try {
+                if (!task_MapLoadAsync_Finish.tryAcquire(15L, TimeUnit.SECONDS)) {
+                    Log.d("TEST", "TASK: TIMEOUT task i");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.d("TEST", "TASK: End task i");
+            task_MapLoadAsync_Finish.release();
+        }
+
+        //END ADDED
         return null;
     }
 
