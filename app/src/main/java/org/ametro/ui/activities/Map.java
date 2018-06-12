@@ -123,6 +123,7 @@ public class Map extends AppCompatActivity implements
         if(mapView!=null){
             app.setCenterPositionAndScale(mapView.getCenterPositionAndScale());
         }
+        Log.d("TEST", "onPause");
     }
 
     @Override
@@ -142,6 +143,7 @@ public class Map extends AppCompatActivity implements
                 ).execute();
             }
         }
+        Log.d("TEST", "onResume");
     }
 
     @Override

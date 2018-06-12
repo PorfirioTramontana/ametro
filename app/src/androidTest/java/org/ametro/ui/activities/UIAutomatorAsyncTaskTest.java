@@ -1,30 +1,10 @@
 package org.ametro.ui.activities;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.RemoteException;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.test.uiautomator.By;
-import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiDevice;
-import android.support.test.uiautomator.UiObject;
-import android.support.test.uiautomator.UiObjectNotFoundException;
-import android.support.test.uiautomator.UiSelector;
-import android.support.test.uiautomator.Until;
-import android.util.Log;
 
-import org.ametro.R;
-import org.ametro.ui.tasks.MapInstallerAsyncTask;
-import org.ametro.ui.tasks.MapLoadAsyncTask;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.concurrent.Semaphore;
-
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 @SdkSuppress(minSdkVersion = 18)
@@ -36,7 +16,7 @@ public class UIAutomatorAsyncTaskTest {
     private static final String STRING_TO_BE_TYPED = "UiAutomator";
     private UiDevice mDevice;
 
-
+/*
     @Test
     public void PrimoTest() throws InterruptedException, UiObjectNotFoundException, RemoteException {
         // SEQUENZA UI->TASK1->TASK2->Sort
@@ -112,13 +92,10 @@ public class UIAutomatorAsyncTaskTest {
         mDevice.pressRecentApps();
 
         Thread.sleep(1000);
-/*
-        UiObject ui = mDevice.findObject(new UiSelector().text("SORT"));
-        ui.click();
-*/
+
         mDevice.findObject(new UiSelector().resourceId("org.ametro.ui.activities:id/logoImageView")).click();
 
         Thread.sleep(2000);
     }
-
+*/
 }
